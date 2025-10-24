@@ -4,7 +4,8 @@ Paperback extensions for websites which use the generic MangaWorld theme.
 
 ## Available Extensions
 
-None yet.
+- [MangaWorld](https://www.mangaworld.cx)
+- [MangaWorldAdult](https://www.mangaworldadult.net)
 
 ## Installation
 
