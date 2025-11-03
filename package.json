@@ -18,12 +18,12 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
+    "@eslint/js": "^9.39.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@paperback/toolchain": "^1.0.0-alpha.57",
     "@paperback/types": "^1.0.0-alpha.57",
     "@types/eslint": "^9.6.1",
-    "eslint": "^9.38.0",
+    "eslint": "^9.39.0",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
