@@ -1,33 +1,30 @@
 {
-    "name": "mangaworld-extensions",
-    "repositoryName": "MangaWorld Extensions (0.9)",
-    "description": "Paperback extensions for websites which use the generic MangaWorld theme.",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "lint": "eslint --fix --cache --cache-location 'node_modules/.cache/eslint/.eslint-cache'",
-        "lint:check": "eslint --cache --cache-location 'node_modules/.cache/eslint/.eslint-cache'",
-        "format": "prettier --write '**/*{.md,.yml,.yaml,.json,.js,.ts}' --cache",
-        "format:check": "prettier --check '**/*{.md,.yml,.yaml,.json,.js,.ts}' --cache",
-        "tsc": "tsc",
-        "bundle": "paperback-cli bundle",
-        "serve": "paperback-cli serve",
-        "logcat": "paperback-cli logcat",
-        "dev": "paperback-cli serve --watch",
-        "test": "npm run tsc && npm run lint:check && npm run format:check && npm run bundle",
-        "prepare": "husky"
-    },
-    "devDependencies": {
-        "@eslint/js": "^9.38.0",
-        "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-        "@paperback/toolchain": "^1.0.0-alpha.57",
-        "@paperback/types": "^1.0.0-alpha.57",
-        "@types/eslint": "^9.6.1",
-        "eslint": "^9.38.0",
-        "husky": "^9.1.7",
-        "prettier": "^3.6.2",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.46.2",
-        "cheerio": "^1.0.0"
-    }
+  "name": "mangaworld-extensions",
+  "repositoryName": "MangaWorld Extensions (0.9)",
+  "description": "Paperback extensions for websites which use the generic MangaWorld theme.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "oxlint --type-aware --fix",
+    "lint:check": "oxlint --type-aware --deny-warnings",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "tsc": "tsc",
+    "bundle": "paperback-cli bundle",
+    "serve": "paperback-cli serve",
+    "logcat": "paperback-cli logcat",
+    "dev": "paperback-cli serve --watch",
+    "test": "npm run tsc && npm run lint:check && npm run format:check && npm run bundle",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@paperback/toolchain": "^1.0.0-alpha.57",
+    "@paperback/types": "^1.0.0-alpha.57",
+    "cheerio": "^1.0.0",
+    "husky": "^9.1.7",
+    "oxfmt": "^0.17.0",
+    "oxlint": "^1.32.0",
+    "oxlint-tsgolint": "^0.9.0",
+    "typescript": "^5.9.3"
+  }
 }
