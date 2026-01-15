@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export const basePbConfig = {
   name: "",
   description: "",
-  version: "1.0.0-alpha.1",
+  version: "1.0.0-alpha.2",
   icon: "",
   language: "",
   capabilities: [
@@ -12,13 +12,7 @@ export const basePbConfig = {
     SourceIntents.SEARCH_RESULTS_PROVIDING,
     SourceIntents.SETTINGS_FORM_PROVIDING,
   ],
-  badges: [
-    {
-      label: "Italian 🇮🇹",
-      textColor: "#ffffff",
-      backgroundColor: "#28eac2",
-    },
-  ],
+  badges: [],
   developers: [
     {
       name: "Catta1997",
