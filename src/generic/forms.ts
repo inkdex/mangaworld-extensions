@@ -1,12 +1,4 @@
-import {
-  ButtonRow,
-  Form,
-  NavigationRow,
-  Section,
-  SelectRow,
-  ToggleRow,
-  type FormSectionElement,
-} from "@paperback/types";
+import { ButtonRow, Form, NavigationRow, Section, SelectRow, ToggleRow } from "@paperback/types";
 import { filter, MangaWorldGeneric } from "./main";
 
 export class Forms extends Form {
@@ -15,7 +7,7 @@ export class Forms extends Form {
     super();
     this.manga_source = manga_source;
   }
-  override getSections(): FormSectionElement[] {
+  override getSections() {
     return [
       Section("settings", [
         NavigationRow("contenuti", {
@@ -58,7 +50,7 @@ class FilterSettings extends Form {
     this.reloadForm();
     Application.invalidateSearchFilters();
   }
-  override getSections(): FormSectionElement[] {
+  override getSections() {
     return [
       Section(
         {
@@ -159,7 +151,7 @@ class FavSettings extends Form {
     title: value,
     ...rest,
   }));
-  override getSections(): FormSectionElement[] {
+  override getSections() {
     return [
       Section(
         {
@@ -215,7 +207,7 @@ class HomeSettings extends Form {
     this.reloadForm();
     Application.invalidateDiscoverSections();
   }
-  override getSections(): FormSectionElement[] {
+  override getSections() {
     return [
       Section(
         {
