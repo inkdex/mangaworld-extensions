@@ -2,6 +2,7 @@
 /* Copyright © 2026 Inkdex */
 
 import { ContentRating } from "@paperback/types";
+
 import { basePbConfig } from "../generic/config";
 
 const pbConfig = basePbConfig;

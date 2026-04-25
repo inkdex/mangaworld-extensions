@@ -9,6 +9,7 @@ import {
   type SearchQuery,
   type SortingOption,
 } from "@paperback/types";
+
 import { filter, MangaWorldGeneric } from "./main";
 
 export class Requests {

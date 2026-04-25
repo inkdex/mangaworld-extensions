@@ -3,6 +3,7 @@
 
 import { ContentRating, type Tag } from "@paperback/types";
 import * as cheerio from "cheerio";
+
 import { jsonParser, MangaWorldGeneric } from "./main";
 import type {
   ChapterList,

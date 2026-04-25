@@ -2,6 +2,7 @@
 /* Copyright © 2026 Inkdex */
 
 import { ButtonRow, Form, NavigationRow, Section, SelectRow, ToggleRow } from "@paperback/types";
+
 import { filter, MangaWorldGeneric } from "./main";
 
 export class Forms extends Form {

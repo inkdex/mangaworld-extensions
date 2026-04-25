@@ -23,6 +23,7 @@ import {
   type SortingOption,
   type SourceManga,
 } from "@paperback/types";
+
 import { Forms } from "./forms";
 import type { MangaMetadata, WindowEntry } from "./models";
 import { MainInterceptor, Requests } from "./network";

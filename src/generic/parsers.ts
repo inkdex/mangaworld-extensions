@@ -12,6 +12,7 @@ import {
   type SourceManga,
   type TagSection,
 } from "@paperback/types";
+
 import { filter, jsonParser, MangaWorldGeneric, tags, types } from "./main";
 import type { Manga, MangaChapterList, MangaMetadata, TrendingManga, WindowEntry } from "./models";
 
