@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright © 2026 Inkdex */
+
 import { ButtonRow, Form, NavigationRow, Section, SelectRow, ToggleRow } from "@paperback/types";
 import { filter, MangaWorldGeneric } from "./main";
 

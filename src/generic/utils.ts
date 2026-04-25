@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright © 2026 Inkdex */
+
 import { ContentRating, type Tag } from "@paperback/types";
 import * as cheerio from "cheerio";
 import { jsonParser, MangaWorldGeneric } from "./main";
