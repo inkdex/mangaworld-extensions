@@ -1,8 +1,18 @@
-name: Test
+name: Run Tests
 
 on:
+  workflow_run:
+    workflows:
+      - Bundle and Deploy
+    types:
+      - completed
+  schedule:
+    - cron: "0 * * * *"
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -10,7 +20,7 @@ concurrency:
 
 jobs:
   test:
-    name: Test
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Branch
@@ -24,3 +34,11 @@ jobs:
         run: npm ci
       - name: Run Tests
         run: npm test
+      - name: Deploy to GitHub Pages
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: bundles
+          destination_dir: ${{ github.ref_name }}
+          keep_files: true
