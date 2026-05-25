@@ -277,6 +277,7 @@ export abstract class MangaWorldGeneric
   }
 
   async getSortingOptions(): Promise<SortingOption[]> {
+    await filter.populateFilter(this);
     return filter.getOrderFilter().map((item) => ({
       id: item.id,
       label: item.value,
