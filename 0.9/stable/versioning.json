@@ -1,0 +1,57 @@
+{
+  "buildTime": "2026-05-31T11:14:23.901Z",
+  "builtWith": {
+    "toolchain": "1.0.0-alpha.87",
+    "types": "1.0.0-alpha.87"
+  },
+  "repository": {
+    "name": "MangaWorld Extensions (0.9)",
+    "description": "Paperback extensions for websites which use the generic MangaWorld theme."
+  },
+  "sources": [
+    {
+      "name": "MangaWorld",
+      "description": "Extension that pulls content from www.mangaworld.mx.",
+      "version": "1.0.0-alpha.4",
+      "icon": "icon.png",
+      "language": "it",
+      "contentRating": "SAFE",
+      "capabilities": [
+        1,
+        4,
+        64,
+        32
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "Catta1997",
+          "github": "https://github.com/Catta1997"
+        }
+      ],
+      "id": "MangaWorld"
+    },
+    {
+      "name": "MangaWorldAdult",
+      "description": "Extension that pulls content from www.mangaworldadult.net.",
+      "version": "1.0.0-alpha.4",
+      "icon": "icon.png",
+      "language": "it",
+      "contentRating": "ADULT",
+      "capabilities": [
+        1,
+        4,
+        64,
+        32
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "Catta1997",
+          "github": "https://github.com/Catta1997"
+        }
+      ],
+      "id": "MangaWorldAdult"
+    }
+  ]
+}
