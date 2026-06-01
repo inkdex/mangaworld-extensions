@@ -1,8 +1,8 @@
 {
-  "buildTime": "2026-05-31T11:14:23.901Z",
+  "buildTime": "2026-06-01T09:52:24.378Z",
   "builtWith": {
-    "toolchain": "1.0.0-alpha.87",
-    "types": "1.0.0-alpha.87"
+    "toolchain": "1.0.0-alpha.89",
+    "types": "1.0.0-alpha.89"
   },
   "repository": {
     "name": "MangaWorld Extensions (0.9)",
