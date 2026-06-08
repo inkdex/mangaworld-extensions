@@ -150,19 +150,12 @@ export abstract class MangaWorldGeneric
 
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     const discover_section: DiscoverSection[] = [];
-    if ((Application.getState("popular_section_enabled") as boolean) ?? true) {
-      discover_section.push({
-        id: "popular_section",
-        title: "Capitoli In Tendenza",
-        type: DiscoverSectionType.featured,
-      });
-    }
     if ((Application.getState("mese_section_enabled") as boolean) ?? true) {
       discover_section.push({
         id: "mese_section",
         title: "Tendenze del Mese",
         subtitle: "Più letti del mese",
-        type: DiscoverSectionType.prominentCarousel,
+        type: DiscoverSectionType.featured,
       });
     }
     if ((Application.getState("most_read_section_enabled") as boolean) ?? true) {
@@ -179,6 +172,13 @@ export abstract class MangaWorldGeneric
         title: "Nuove Aggiunte",
         subtitle: "Le nuove Aggiunte",
         type: DiscoverSectionType.simpleCarousel,
+      });
+    }
+    if ((Application.getState("popular_section_enabled") as boolean) ?? true) {
+      discover_section.push({
+        id: "popular_section",
+        title: "Capitoli In Tendenza",
+        type: DiscoverSectionType.chapterUpdates,
       });
     }
     if ((Application.getState("update_section_enabled") as boolean) ?? true) {

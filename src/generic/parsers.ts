@@ -276,12 +276,14 @@ export class Parsers {
   ): { items: DiscoverSectionItem[]; metadata: MangaMetadata } {
     const items: DiscoverSectionItem[] = chapters.map((chapter) => ({
       metadata: metadata,
-      type: "featuredCarouselItem",
+      type: "chapterUpdatesCarouselItem",
+      chapterId: chapter.id,
+      subtitle: chapter.name,
+      publishDate: new Date(chapter.createdAt),
       contentRating:
         source.defaultContentRating === ContentRating.ADULT
           ? ContentRating.ADULT
           : source.defaultContentRating,
-      supertitle: chapter.name,
       mangaId: `${chapter.manga.linkId}/${chapter.manga.slug}`,
       title: chapter.manga.title ?? "",
       imageUrl: chapter.manga.imageT ?? chapter.manga.image,
@@ -304,11 +306,14 @@ export class Parsers {
   ): { items: DiscoverSectionItem[]; metadata: MangaMetadata } {
     const items: DiscoverSectionItem[] = mangas.map((manga) => ({
       metadata: metadata,
-      type: "prominentCarouselItem",
+      type: "featuredCarouselItem",
       contentRating:
         source.defaultContentRating === ContentRating.ADULT
           ? ContentRating.ADULT
           : tags.getRating(manga.genres?.map((g) => g.slug) ?? []),
+      summary: manga.trama,
+      supertitle: manga.author.join(", "),
+      infoItems: [{ symbol: "book.fill", text: manga.status }],
       imageUrl: manga.imageT ?? manga.image,
       mangaId: `${manga.linkId}/${manga.slug}`,
       title: manga.title ?? "",
