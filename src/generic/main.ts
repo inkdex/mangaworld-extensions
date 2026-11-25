@@ -26,15 +26,15 @@ import {
 
 import { MangaWorldAdvancedSearchForm } from "./forms/search";
 import { Forms } from "./forms/settings";
-import type { MangaMetadata, SearchMetadata, WindowEntry } from "./models";
+import type { MangaMetadata, SearchMetadata } from "./models";
 import { MainInterceptor, Requests } from "./network";
 import { Parsers } from "./parsers";
-import { FilterPreferences, JsonParser, Tags, Type } from "./utils";
+import { parseArchive, parseChapterList, parseMangaPage, parseReaderPages } from "./scraper";
+import { FilterPreferences, Tags, Type } from "./utils";
 
 export const filter = new FilterPreferences();
 export const tags = new Tags();
 export const types = new Type();
-export const jsonParser = new JsonParser();
 export interface GenericParams {
   name: string;
   domain: string;
@@ -115,37 +115,26 @@ export abstract class MangaWorldGeneric
       sorting,
       this,
     );
-    const html = await this.requestManager.getSearchResultsRequests(url);
-    const windowEntry = jsonParser.getWindowEntry(html);
-    return await this.parser.parseSearchResults(excluded, this, metadata, windowEntry);
+    const $ = await this.requestManager.fetchHTML(url);
+    return this.parser.parseSearchResults(excluded, this, metadata, parseArchive($, this.base_url));
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const data = this.requestManager.fetchPage(`${this.base_url}/manga/${mangaId}`);
-    const html = Application.arrayBufferToUTF8String(await data);
-    const windowEntry = jsonParser.getWindowEntry(html);
-    return this.parser.parseMangaDetails(
-      windowEntry,
-      mangaId,
-      `${this.base_url}/manga/${mangaId}`,
-      this,
-    );
+    const shareUrl = `${this.base_url}/manga/${mangaId}`;
+    const $ = await this.requestManager.fetchHTML(shareUrl);
+    return this.parser.parseMangaDetails(parseMangaPage($, this.base_url), mangaId, shareUrl, this);
   }
 
   async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
-    const data = this.requestManager.fetchPage(`${this.base_url}/manga/${sourceManga.mangaId}`);
-    const html = Application.arrayBufferToUTF8String(await data);
-    const windowEntry = jsonParser.getWindowEntry(html);
-    return this.parser.parseChapters(windowEntry, sourceManga);
+    const $ = await this.requestManager.fetchHTML(`${this.base_url}/manga/${sourceManga.mangaId}`);
+    return this.parser.parseChapters(parseChapterList($), sourceManga);
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const data = this.requestManager.fetchPage(
-      `${this.base_url}/manga/${chapter.sourceManga.mangaId}`,
+    const $ = await this.requestManager.fetchHTML(
+      `${this.base_url}/manga/${chapter.sourceManga.mangaId}/read/${chapter.chapterId}?style=list`,
     );
-    const html = Application.arrayBufferToUTF8String(await data);
-    const windowEntry = jsonParser.getWindowEntry(html);
-    return this.parser.parseChapterDetails(windowEntry, chapter.chapterId);
+    return this.parser.parseChapterDetails(parseReaderPages($, this.base_url), chapter);
   }
 
   async getDiscoverSections(): Promise<DiscoverSection[]> {
@@ -200,14 +189,6 @@ export abstract class MangaWorldGeneric
         type: DiscoverSectionType.simpleCarousel,
       });
     }
-    if ((Application.getState("new_section_enabled") as boolean) ?? true) {
-      discover_section.push({
-        id: "new_manga_section",
-        title: "Nuove Aggiunte",
-        subtitle: "Le nuove Aggiunte",
-        type: DiscoverSectionType.simpleCarousel,
-      });
-    }
     if ((Application.getState("type_section_enabled") as boolean) ?? true) {
       discover_section.push({
         id: "type_section",
@@ -227,53 +208,30 @@ export abstract class MangaWorldGeneric
     return discover_section;
   }
 
-  async getSection(id: string, json: WindowEntry[], metadata: MangaMetadata) {
-    let section: { items: DiscoverSectionItem[]; metadata: MangaMetadata } = {
-      items: [],
-      metadata: metadata,
-    };
-    const parsers: Record<
-      string,
-      () => Promise<{
-        items: DiscoverSectionItem[];
-        metadata: MangaMetadata;
-      }>
-    > = {
-      updated_section: () => this.parser.parseChapterUpdateSection(metadata, this),
-      most_read_section: () => this.parser.parseMostReadSection(metadata, this),
-      new_manga_section: () => this.parser.parseLastAddedSection(metadata, this, false),
-      new_fav_type_section: () => this.parser.parseLastAddedSection(metadata, this, true),
-      genre_section: () => this.parser.parseGenreSection(this, metadata),
-      type_section: () => this.parser.parseTypeSection(this, metadata),
-    };
-    if (id === "popular_section" || id === "mese_section") {
-      for (const item of json) {
-        if (id === "popular_section" && item.kind === "trending") {
-          section = this.parser.parseTrendingChapters(metadata, this, item.data.mostViewedChapters);
-          break;
-        }
-
-        if (id === "mese_section" && item.kind === "global") {
-          section = this.parser.parseMonthTrending(metadata, this, item.data.globalData.topMangas);
-          break;
-        }
-      }
-    }
-    if (section.items.length > 1) return section;
-    const sectionParser = parsers[id];
-    if (sectionParser) return await sectionParser();
-    return section;
-  }
-
   async getDiscoverSectionItems(
     section: DiscoverSection,
-    metadata: MangaMetadata,
+    metadata: MangaMetadata | undefined,
   ): Promise<PagedResults<DiscoverSectionItem>> {
-    const html = Application.arrayBufferToUTF8String(
-      await this.requestManager.fetchPage(this.base_url),
-    );
-    const windowEntry = jsonParser.getWindowEntry(html);
-    return await this.getSection(section.id, windowEntry, metadata);
+    switch (section.id) {
+      case "mese_section":
+        return this.parser.parseMonthTrending(this);
+      case "popular_section":
+        return this.parser.parseTrendingChaptersSection(this);
+      case "updated_section":
+        return this.parser.parseChapterUpdateSection(metadata, this);
+      case "most_read_section":
+        return this.parser.parseMostReadSection(metadata, this);
+      case "new_manga_section":
+        return this.parser.parseLastAddedSection(metadata, this, false);
+      case "new_fav_type_section":
+        return this.parser.parseLastAddedSection(metadata, this, true);
+      case "genre_section":
+        return this.parser.parseGenreSection(this, metadata);
+      case "type_section":
+        return this.parser.parseTypeSection(this, metadata);
+      default:
+        return { items: [], metadata: undefined };
+    }
   }
 
   async getSortingOptions(): Promise<SortingOption[]> {

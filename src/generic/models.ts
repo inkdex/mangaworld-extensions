@@ -6,199 +6,85 @@ import type { JSONObject } from "@paperback/types";
 export type MangaMetadata = {
   page: number;
 };
+
 export type OptionItem = {
   value: string;
   id: string;
 };
-export type RawEntry = [key: string, index: number, data: unknown, meta?: { f?: number }];
 
 export interface Genre {
   name: string;
   slug: string;
 }
 
-export interface Fansub {
-  name: string;
-}
-
-export interface JSONConfig {
-  CSRFToken: string;
-  ADULT: boolean;
-  URL: string;
-  PUBLIC_URL: string;
-  SITE_NAME: string;
-  localURL: string;
-  seo: object;
-}
-
-export interface Manga {
+export interface MangaCard {
   id: string;
   title: string;
-  slug: string;
-  author: string[];
-  artist: string[];
+  image: string;
+  authors: string;
+  type: string;
   genres: Genre[];
-  fansub: Fansub | null;
-  trama: string;
-  extraTitles: string[];
+}
+
+export interface PagedCards {
+  items: MangaCard[];
+  hasNext: boolean;
+}
+
+export interface MangaPage {
+  title: string;
+  image: string;
+  synopsis: string;
+  authors: string;
+  artists: string;
   status: string;
-  type: string;
-  image: string;
-  imageT: string;
-  slugFolder: string;
-  linkId: number;
-  typeT: string;
-  statusT: string;
-  tramaT: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface MangaChapterList {
-  id: string;
-  manga: string;
-  name: string;
-  title?: string | null;
-  pages: string[];
-  slugFolder: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface JSONChapter {
-  id: string;
-  pages: string[];
-  manga?: Manga;
-  volume?: string;
-  name: string;
-  title: string;
-  slugFolder: string;
-  createdAt: string;
-}
-
-export interface Volume {
-  id: string;
-  manga: string;
-  name: string;
-  slugFolder: string;
-  image: string;
-  imageT: string;
-}
-
-export interface Volumes {
-  volume: Volume;
-  chapters: MangaChapterList[];
-}
-
-export interface Pages {
-  volumes: Volumes[];
-  singleChapters: MangaChapterList[];
-}
-
-export interface ChapterList {
-  URL: string;
-  CDN_URL: string;
-  pages: Pages;
-}
-
-export interface TrendingManga {
-  id: string;
-  manga: Manga;
-  name: string;
-  pages: string[];
-  slugFolder: string;
-  createdAt: string;
-}
-
-export interface TrendingChaptersData {
-  URL: string;
-  mostViewedChapters: TrendingManga[];
-}
-
-export interface GlobalData {
+  fansub: string | null;
+  altTitles: string[];
   genres: Genre[];
-  topMangas: Manga[];
-  latestMangas: Manga[];
 }
 
-export interface SearchResults {
-  URL: string;
-  results: number;
-  selected: object;
-  authors: string[];
-  artists: string[];
-  years: (number | string)[];
-  mangas: Manga[];
-  chapters: JSONChapter[];
+export interface ChapterRow {
+  id: string;
+  name: string;
+  chapNum: number;
+  date: Date;
+  volume?: number;
+  volumeName?: string;
 }
 
-export interface SearchInfo {
-  totalPages: number;
-}
-
-export interface MangaPageData {
+export interface TopItem {
+  id: string;
+  title: string;
+  image: string;
   type: string;
-  manga: Manga;
-  chapters: JSONChapter[];
+  views: string;
+  rating: string;
 }
 
-export type WindowEntry =
-  | {
-      kind: "config";
-      key: string;
-      index: number;
-      data: object;
-      meta?: { f?: number };
-    }
-  | {
-      kind: "global";
-      key: string;
-      index: number;
-      data: { globalData: GlobalData };
-      meta?: { f?: number };
-    }
-  | {
-      kind: "manga";
-      key: string;
-      index: number;
-      data: MangaPageData;
-      meta?: { f?: number };
-    }
-  | {
-      kind: "trending";
-      key: string;
-      index: number;
-      data: TrendingChaptersData;
-      meta?: { f?: number };
-    }
-  | {
-      kind: "chapter";
-      key: string;
-      index: number;
-      data: ChapterList;
-      meta?: { f?: number };
-    }
-  | {
-      kind: "search";
-      key: string;
-      index: number;
-      data: SearchResults;
-      meta?: { f?: number };
-    }
-  | {
-      kind: "searchInfo";
-      key: string;
-      index: number;
-      data: SearchInfo;
-      meta?: { f?: number };
-    };
+export interface TrendingChapter {
+  mangaId: string;
+  title: string;
+  image: string;
+  chapterName: string;
+  chapNum: number;
+}
 
-export interface JsonData {
-  o: {
-    l: number;
-    g: { maintenance: boolean };
-    w: WindowEntry[];
-  };
+export interface LatestChapter {
+  id: string;
+  title: string;
+  date?: Date;
+}
+
+export interface LatestUpdate {
+  mangaId: string;
+  title: string;
+  image: string;
+  chapters: LatestChapter[];
+}
+
+export interface PagedLatest {
+  items: LatestUpdate[];
+  hasNext: boolean;
 }
 
 export interface SearchMetadata extends JSONObject {
@@ -208,4 +94,3 @@ export interface SearchMetadata extends JSONObject {
   sort?: string[];
   year?: number;
 }
-//["genres", "type", "status", "sort", "year"]
