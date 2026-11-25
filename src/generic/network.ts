@@ -9,11 +9,37 @@ import {
   type SearchQuery,
   type SortingOption,
 } from "@paperback/types";
+import * as cheerio from "cheerio";
 
-import { filter, MangaWorldGeneric } from "./main";
+import type { MangaWorldGeneric } from "./main";
 import type { SearchMetadata } from "./models";
 
+export interface ArchiveParams {
+  page: number;
+  keyword?: string;
+  sort?: string;
+  genres?: string[];
+  excludeGenres?: string[];
+  types?: string[];
+  status?: string[];
+  year?: number;
+}
+
 export class Requests {
+  buildArchiveURL(source: MangaWorldGeneric, params: ArchiveParams): string {
+    const url = new URL(source.base_url).addPathComponent("archive");
+    if (params.keyword && params.keyword.length > 0) url.setQueryItem("keyword", params.keyword);
+    url.setQueryItem("page", params.page.toString());
+    if (params.sort) url.setQueryItem("sort", params.sort);
+    if (params.genres && params.genres.length > 0) url.setQueryItem("genre", params.genres);
+    if (params.excludeGenres && params.excludeGenres.length > 0)
+      url.setQueryItem("exclude", params.excludeGenres);
+    if (params.types && params.types.length > 0) url.setQueryItem("type", params.types);
+    if (params.status && params.status.length > 0) url.setQueryItem("status", params.status);
+    if (params.year) url.setQueryItem("year", params.year.toString());
+    return url.toString();
+  }
+
   constructSearchRequestURL(
     page: number,
     query: SearchQuery<SearchMetadata> = { title: "", metadata: {} },
@@ -26,99 +52,29 @@ export class Requests {
     const genres: Record<string, "included" | "excluded"> = query.metadata?.genres ?? {};
     const types: Record<string, "included" | "excluded"> = query.metadata?.type ?? {};
 
-    const generi: string[] = [];
-    const generi_esclusi: string[] = [];
-    const tipi_esclusi: string[] = [];
-    const tipologia: string[] = [];
-    for (const tag of Object.entries(genres)) {
-      if (tag[1] == "included") generi.push(tag[0]);
-      if (tag[1] == "excluded")
-        generi_esclusi.push(
-          filter.getGenreFilter().find((item) => item.id === tag[0])?.value ?? "",
-        );
-    }
-    if (types && typeof types === "object") {
-      for (const tag of Object.entries(types)) {
-        if (tag[1] == "included") tipologia.push(tag[0]);
-        if (tag[1] == "excluded") tipi_esclusi.push(tag[0]);
-      }
-    }
-    const statusFilter = query.metadata?.status ?? [];
-    const yearFilter = query.metadata?.year ?? 0;
-    const url = new URL(source.base_url).addPathComponent("archive");
-    if (query.title.toString().length > 0)
-      url.setQueryItem("keyword", query.title.toString() ?? "");
-    url.setQueryItem("page", page.toString());
-    if (sorting?.id) url.setQueryItem("sort", sorting?.id);
-    if (generi.length > 0) url.setQueryItem("genre", generi);
-    if (tipologia.length > 0) url.setQueryItem("type", tipologia);
-    if (statusFilter.length > 0) url.setQueryItem("status", statusFilter ?? "");
-    if (yearFilter != 0) url.setQueryItem("year", yearFilter.toString() ?? "");
-    return {
-      url: url.toString(),
-      excluded: { generi: generi_esclusi, tipi: tipi_esclusi },
-    };
-  }
+    const included = (list: Record<string, "included" | "excluded">) =>
+      Object.entries(list)
+        .filter(([, state]) => state === "included")
+        .map(([id]) => id);
+    const excluded = (list: Record<string, "included" | "excluded">) =>
+      Object.entries(list)
+        .filter(([, state]) => state === "excluded")
+        .map(([id]) => id);
 
-  async parseFilters(source: MangaWorldGeneric) {
-    return Application.arrayBufferToUTF8String(
-      await source.requestManager.fetchPage(`${source.base_url}/archive`),
-    );
-  }
+    const generiEsclusi = excluded(genres);
+    const tipiEsclusi = excluded(types);
 
-  async parseLastMangaAddedTagsSectionRequests(
-    page: number,
-    source: MangaWorldGeneric,
-    favTags: boolean,
-  ) {
-    let html = "";
-    const tags = favTags ? (Application.getState("fav_tags_new") as string[]).join("&genre=") : "";
-    if (page > 1) {
-      const data = (
-        await Application.scheduleRequest({
-          url: `${source.base_url}/archive?sort=newest&page=${page}&genre=${tags}`,
-          method: "GET",
-        })
-      )[1];
-      html = Application.arrayBufferToUTF8String(data);
-    } else {
-      html = Application.arrayBufferToUTF8String(
-        await source.requestManager.fetchPage(
-          `${source.base_url}/archive?sort=newest&page=${page}&genre=${tags}`,
-        ),
-      );
-    }
-    return html;
-  }
-
-  async parsePopularSectionRequests(page: number, source: MangaWorldGeneric) {
-    let html = "";
-    if (page > 1) {
-      const data = (
-        await Application.scheduleRequest({
-          url: `${source.base_url}/archive?sort=most_read&page=${page}`,
-          method: "GET",
-        })
-      )[1];
-      html = Application.arrayBufferToUTF8String(data);
-    } else {
-      html = Application.arrayBufferToUTF8String(
-        await source.requestManager.fetchPage(
-          `${source.base_url}/archive?sort=most_read&page=${page}`,
-        ),
-      );
-    }
-    return html;
-  }
-
-  async getSearchResultsRequests(url: string) {
-    const data = (
-      await Application.scheduleRequest({
-        url: url,
-        method: "GET",
-      })
-    )[1];
-    return Application.arrayBufferToUTF8String(data);
+    const url = this.buildArchiveURL(source, {
+      page,
+      keyword: query.title.toString(),
+      sort: sorting?.id,
+      genres: included(genres),
+      excludeGenres: generiEsclusi,
+      types: included(types),
+      status: query.metadata?.status ?? [],
+      year: query.metadata?.year ?? 0,
+    });
+    return { url, excluded: { generi: generiEsclusi, tipi: tipiEsclusi } };
   }
 
   async fetchPage(url: string): Promise<ArrayBuffer> {
@@ -128,6 +84,14 @@ export class Requests {
         method: "GET",
       })
     )[1];
+  }
+
+  async fetchHTML(url: string): Promise<cheerio.CheerioAPI> {
+    return cheerio.load(Application.arrayBufferToUTF8String(await this.fetchPage(url)));
+  }
+
+  async parseFilters(source: MangaWorldGeneric): Promise<cheerio.CheerioAPI> {
+    return this.fetchHTML(`${source.base_url}/archive`);
   }
 }
 
